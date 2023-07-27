@@ -19,18 +19,26 @@ const fetchData = async (path) => {
 }
 
 
-function showFile (input) {
+function showFile(input) {
+
+    let files = input.files
+    console.log(files)
+
+    const len = files.length
+    for(let i=0; i<len; i++){
+        sendFile(files.item(i))
+    }
+
+}
 
 
-    let file = input.files[0]
-    console.log(file)
-
+function sendFile(file) {
     let reader = new FileReader()
     reader.readAsArrayBuffer(file)
 
 
     reader.onload = () => {
-        const data = (reader.result)
+        const data = reader.result
 
 
         const fileName = file.name
@@ -60,11 +68,7 @@ function showFile (input) {
 
 
     }
-
 }
-
-
-
 
 
 
