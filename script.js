@@ -18,45 +18,54 @@ const fetchData = async (path) => {
     }
 }
 
-const convert = 'test.txt'
-console.log(convert)
-let path = `https://cloud-api.yandex.net/v1/disk/resources/upload
-?path=%2Ftemp%2F${convert}
-&overwrite=true`
-// fetchData(path)
+
+function showFile (input) {
 
 
+    let file = input.files[0]
+    console.log(file)
 
-fetch(path, {
-    method: 'GET',
-    // body: blob,
-    headers: {
-        "Content-Type": 'application/json', 
-        Accept: 'application/json',
-        Authorization: "OAuth y0_AgAAAAAJlBpGAAo-ZQAAAADoxuYVwMK5E3s2RkiUnRsNUeOdB0anSOs"
+    let reader = new FileReader()
+    reader.readAsArrayBuffer(file)
+
+
+    reader.onload = () => {
+        const data = (reader.result)
+
+
+        const fileName = file.name
+        let path = `https://cloud-api.yandex.net/v1/disk/resources/upload?path=%2Ftemp%2F${fileName}&overwrite=true`
+
+
+        fetch(path, {
+            method: 'GET',
+            headers: {
+                "Content-Type": 'application/json',
+                Accept: 'application/json',
+                Authorization: "OAuth y0_AgAAAAAJlBpGAAo-ZQAAAADoxuYVwMK5E3s2RkiUnRsNUeOdB0anSOs"
+            }
+        })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result)
+
+
+                fetch(result.href, {
+                    method: 'PUT',
+                    body: data,
+                }).then()
+
+
+            })
+
+
     }
-})
-.then(response => response.json())
-.then(result => {
-    console.log(result)
-    
+
+}
 
 
-    fetch(result.href, {
-        method: 'PUT',
-        // body: blob,
-        headers: {
-            // Accept: 'application/json',
-            // Authorization: "OAuth y0_AgAAAAAJlBpGAAo-ZQAAAADoxuYVwMK5E3s2RkiUnRsNUeOdB0anSOs"
-        }
-    })
-    // .then(response => response.json())
-    // .then(result => {
-    //     console.log(result)
-    // })
 
 
-})
 
 
   
