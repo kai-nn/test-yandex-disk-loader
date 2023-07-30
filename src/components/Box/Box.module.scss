@@ -1,0 +1,33 @@
+.Box {
+    width: 400px;
+    height: 460px;
+    background: lightcyan;
+    border: 1px solid gray;
+    border-radius: 2px;
+    padding: 10px;
+}
+
+.header {
+    height: 30px;
+}
+
+.selectFile {
+    height: 30px;
+}
+
+.sendFile {
+    height: 30px;
+}
+
+input {
+    display: none;
+}
+
+button {
+    width: 100%;
+    height: 30px;
+}
+
+.fakeInputBtn {
+    pointer-events: none;
+}
