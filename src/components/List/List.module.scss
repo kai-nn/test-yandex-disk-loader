@@ -15,7 +15,7 @@
   flex-direction: column;
   height: 300px;
   padding: 5px;
-  background: #DBECECFF;
+  background: #d9e7eb;
   border: 1px solid #BECECEFF;
   border-radius: 2px;
   overflow-y: auto;
@@ -24,9 +24,11 @@
 
 .str {
   display: flex;
+  min-height: 1.5em;
 }
 .marker {
   width: 15px;
+  color: green;
 }
 
 .text {

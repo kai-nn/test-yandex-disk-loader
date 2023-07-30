@@ -1,16 +1,17 @@
 import cls from "./Box.module.scss"
 import { ChangeEvent, useEffect, useState } from "react";
 import List from "../List/List";
+import { Additional } from '../../types/Additional'
+import Status from "../Status/Status";
+import { token } from "../../variable/variable";
 
 
 const Box = () => {
 
-
-
-
-    const [filesName, setFilesName] = useState<string[]>([])
+    const [additionalFields, setAdditionalFields] = useState<Additional[]>([])
     const [files, setFiles] = useState<FileList>(null)
     const [isFilesRead, setIsFilesRead] = useState(true)
+    const [message, setMessage] = useState<string | null>(null)
 
     const readFile = (ev: ChangeEvent<HTMLInputElement>) => {
         const files = ev.target.files
@@ -20,66 +21,74 @@ const Box = () => {
 
     useEffect(() => {
         if (files){
-            let arrNames: string[] = []
+            let arrNames: Additional[] = []
             for(let i=0; i<files.length; i++){
-                arrNames.push(files.item(i).name)
+                arrNames.push({
+                    name: files.item(i).name,
+                    marker: '',
+                    i: i,
+                })
             }
-            setFilesName([...arrNames])
-            // console.log('arrNames', arrNames)
+            setAdditionalFields([...arrNames])
         }
-        console.log('filesName', filesName)
     }, [files])
 
 
     const sendHandler = () => {
         for(let i=0; i<files.length; i++){
-            sendFile(files.item(i))
+            sendFile({
+                file: files.item(i),
+                i: i
+            })
         }
 
         setTimeout(() => {
             setIsFilesRead(true)
             setFiles(null)
-            setFilesName([]) 
-        }, 2000)
+            setAdditionalFields([])
+            setMessage(null)
+        }, 3000)
         
     }
 
-    
-    const sendFile = (file: File) => {
-        
+    const sendFile = (item: Additional) => {
+
+        const {file, i} = item
+
         let reader: FileReader = new FileReader()
         reader.readAsArrayBuffer(file)
 
         reader.onload = () => {
             const data = reader.result
-
-            // console.log(data)
-            const fileName: string = file.name
-            // console.log(fileName)
-
-            let path: string = `https://cloud-api.yandex.net/v1/disk/resources/upload?path=%2Ftemp%2F${fileName}&overwrite=true`
+            const fileName = file.name
+            const path = `https://cloud-api.yandex.net/v1/disk/resources/upload?path=%2Ftemp%2F${fileName}&overwrite=true`
 
             fetch(path, {
                 method: 'GET',
                 headers: {
                     "Content-Type": 'application/json',
                     Accept: 'application/json',
-                    Authorization: "OAuth y0_AgAAAAAJlBpGAAo-ZQAAAADoxuYVwMK5E3s2RkiUnRsNUeOdB0anSOs"
+                    Authorization: "OAuth " + token
                 }
             })
                 .then(response => response.json())
                 .then(result => {
-                    console.log(result)
-                    
+                    const temp = additionalFields.map((el, i ) => el.i === i ? {...el, marker: '✓'} : el)
+                    setAdditionalFields([...temp])
+
                     fetch(result.href, {
                         method: 'PUT',
                         body: data,
-                    }).then()
+                    }).then(response => {
+                        // console.log(response)
+                        if(response.ok){
+                            setMessage('Успешно')
+                        }
+                    })
                 })
                 .catch(e => {
-                    console.log('Error!', e)
+                    setMessage('Что-то пошло не так...')
                 })
-            
         }
     }
 
@@ -90,7 +99,7 @@ const Box = () => {
             <label htmlFor='input'><button className={cls.fakeInputBtn}>Выбрать файлы</button></label>
             <input id='input' className={cls.selectFile} type='file' multiple onChange={readFile}/>
             
-            <List filesName={filesName} isFilesRead={isFilesRead}/>
+            <List additionalFields={additionalFields} isFilesRead={isFilesRead}/>
 
             <button
                 className={cls.sendFile}
@@ -99,6 +108,8 @@ const Box = () => {
             >
                 Отправить
             </button>
+            
+            <Status message={message} isFilesRead={isFilesRead} />
         </div>
     )
 }
